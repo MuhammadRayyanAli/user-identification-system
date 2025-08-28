@@ -2,13 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import mysql.connector
 
 app = Flask(__name__)
-app.secret_key = "secret_key"
+app.secret_key = "secret_key"  # Needed for sessions
 
 # Database connection
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="password",
+    password="password",  # replace with your MySQL password
     database="user_system"
 )
 cursor = db.cursor(dictionary=True)
@@ -36,6 +36,7 @@ def register():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+
         cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
         db.commit()
         return redirect(url_for("home"))
@@ -44,7 +45,7 @@ def register():
 @app.route("/dashboard")
 def dashboard():
     if "username" in session:
-        return f"Welcome {session['username']}!"
+        return render_template("dashboard.html", username=session["username"])
     return redirect(url_for("home"))
 
 if __name__ == "__main__":
